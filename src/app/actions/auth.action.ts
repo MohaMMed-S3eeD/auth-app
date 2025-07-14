@@ -16,6 +16,31 @@ export const loginAction = async (data: z.infer<typeof loginSchema>) => {
             error: validation.error.issues[0].message
         }
     }
+    const { email, password } = validation.data;
+    const userCheck = await prisma.user.findUnique({
+        where: {
+            email: email
+        }
+    })
+    if (!userCheck) {
+        return {
+            success: false,
+            error: "User not found"
+        }
+    }
+    if (!userCheck.password) {
+        return {
+            success: false,
+            error: "User not found"
+        }
+    }
+    const isPasswordValid = await bcrypt.compare(password, userCheck.password);
+    if (!isPasswordValid) {
+        return {
+            success: false,
+            error: "Invalid password"
+        }
+    }
     return {
         success: true,
         message: "Login successful"
@@ -52,7 +77,7 @@ export const registerAction = async (data: z.infer<typeof registerSchema>) => {
         }
     })
     console.log(user)
-    return {    
+    return {
         success: true,
         message: "create account successful"
     }
