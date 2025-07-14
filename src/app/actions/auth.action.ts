@@ -4,7 +4,7 @@ import { loginSchema } from "@/utils/validationSchmas";
 import { registerSchema } from "@/utils/validationSchmas";
 import { z } from "zod";
 import * as bcrypt from "bcryptjs";
-import { signIn } from "@/auth";
+import { signIn, signOut } from "@/auth";
 import { AuthError } from "next-auth";
 
 
@@ -52,6 +52,9 @@ export const loginAction = async (data: z.infer<typeof loginSchema>) => {
     }
 };
 
+export const logoutAction = async () => {
+    await signOut()
+}
 
 
 
