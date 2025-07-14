@@ -4,6 +4,8 @@ import { loginSchema } from "@/utils/validationSchmas";
 import { registerSchema } from "@/utils/validationSchmas";
 import { z } from "zod";
 import * as bcrypt from "bcryptjs";
+import { signIn } from "@/auth";
+import { AuthError } from "next-auth";
 
 
 
@@ -17,28 +19,31 @@ export const loginAction = async (data: z.infer<typeof loginSchema>) => {
         }
     }
     const { email, password } = validation.data;
-    const userCheck = await prisma.user.findUnique({
-        where: {
-            email: email
+    try {
+        await signIn("credentials", { email, password, redirectTo: "/profile" })
+    } catch (error) {
+        // إذا كان الخطأ NEXT_REDIRECT، فهذا يعني نجح تسجيل الدخول وسيتم التوجيه
+        if (error instanceof Error && error.message === "NEXT_REDIRECT") {
+            throw error; // إعادة رمي الخطأ للسماح بالتوجيه
         }
-    })
-    if (!userCheck) {
+
+        if (error instanceof AuthError) {
+            switch (error.type) {
+                case "CredentialsSignin":
+                    return {
+                        success: false,
+                        error: "Invalid email or password"
+                    }
+                default:
+                    return {
+                        success: false,
+                        error: `An error occurred ${error.message}`
+                    }
+            }
+        }
         return {
             success: false,
-            error: "User not found"
-        }
-    }
-    if (!userCheck.password) {
-        return {
-            success: false,
-            error: "User not found"
-        }
-    }
-    const isPasswordValid = await bcrypt.compare(password, userCheck.password);
-    if (!isPasswordValid) {
-        return {
-            success: false,
-            error: "Invalid password"
+            error: `An error occurred ${error}`
         }
     }
     return {
@@ -46,6 +51,10 @@ export const loginAction = async (data: z.infer<typeof loginSchema>) => {
         message: "Login successful"
     }
 };
+
+
+
+
 export const registerAction = async (data: z.infer<typeof registerSchema>) => {
     const validation = registerSchema.safeParse(data);
 

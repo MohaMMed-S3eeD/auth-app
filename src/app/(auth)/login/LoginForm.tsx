@@ -3,7 +3,6 @@ import Spiner from "@/app/_components/spiner";
 import { loginAction } from "@/app/actions/auth.action";
 import React, { useState } from "react";
 import { toast } from "sonner";
-
 const LoginForm = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -13,15 +12,14 @@ const LoginForm = () => {
     e.preventDefault();
     setIsLoading(true);
     loginAction({ email, password }).then((res) => {
-      setTimeout(() => {
-        if (res.success) {
-          setIsLoading(false);
-          toast.success(res.message);
-        } else {
-          setIsLoading(false);
-          toast.error(res.error);
-        }
-      }, 500);
+      setIsLoading(true);
+      if (!res.success) {
+        setIsLoading(false);
+        toast.error(res.error);
+      } else {
+        setIsLoading(false);
+        toast.success(res.message);
+      }
     });
   };
   return (
