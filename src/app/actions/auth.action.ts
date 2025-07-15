@@ -6,6 +6,7 @@ import { z } from "zod";
 import * as bcrypt from "bcryptjs";
 import { signIn, signOut } from "@/auth";
 import { AuthError } from "next-auth";
+import { generateVerificationToken } from "@/utils/generateToken";
 
 
 
@@ -89,8 +90,10 @@ export const registerAction = async (data: z.infer<typeof registerSchema>) => {
         }
     })
     console.log(user)
+    const vToken = await generateVerificationToken(email);
+    console.log(vToken)
     return {
         success: true,
-        message: "create account successful"
+        message: "Please check your email for verification"
     }
 };
