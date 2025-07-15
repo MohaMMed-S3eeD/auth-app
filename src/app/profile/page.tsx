@@ -21,6 +21,10 @@ const Profile = async () => {
             <label className="text-sm font-medium text-gray-600">Name:</label>
             <p className="text-gray-800">{session.user?.name}</p>
           </div>
+          <div className="border-b pb-2">
+            <label className="text-sm font-medium text-gray-600">ID:</label>
+            <p className="text-gray-800">{session.user?.id}</p>
+          </div>
         </div>
         <div className="mt-6 pt-4 border-t">
           <form action={logoutAction}>
