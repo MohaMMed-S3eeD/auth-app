@@ -7,6 +7,7 @@ const protectedRoutes = ["/profile", "/"]
 
 export const { auth: middleware } = NextAuth(authConfig)
 
+
 export default middleware((req) => {
 
     const { nextUrl } = req

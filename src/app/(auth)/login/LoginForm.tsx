@@ -1,6 +1,7 @@
 "use client";
 import Spiner from "@/app/_components/spiner";
 import { loginAction } from "@/app/actions/auth.action";
+import SocialProviders from "@/components/SocialProviders";
 import React, { useState } from "react";
 import { toast } from "sonner";
 const LoginForm = () => {
@@ -57,6 +58,7 @@ const LoginForm = () => {
             onChange={(e) => setPassword(e.target.value)}
           />
         </div>
+        
 
         <button
           type="submit"
@@ -64,6 +66,8 @@ const LoginForm = () => {
         >
           {isLoading ? <Spiner /> : "Login"}
         </button>
+        
+        <SocialProviders />
       </form>
     </div>
   );

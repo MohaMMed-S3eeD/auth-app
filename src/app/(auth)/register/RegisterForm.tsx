@@ -1,6 +1,8 @@
 "use client";
 import Spiner from "@/app/_components/spiner";
 import { registerAction } from "@/app/actions/auth.action";
+import { redirect } from "next/navigation";
+
 import React, { useState } from "react";
 import { toast } from "sonner";
 
@@ -19,6 +21,7 @@ const RegisterForm = () => {
         if (res.success) {
           setIsLoading(false);
           toast.success(res.message);
+          redirect("/login");
         } else {
           setIsLoading(false);
           toast.error(res.error);
