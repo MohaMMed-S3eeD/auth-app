@@ -16,3 +16,17 @@ export const generateVerificationToken = async (email: string) => {
     return newVToken;
 };
 
+export const generateResetPasswordToken = async (email: string) => {
+    const resetToken = await prisma.resetPasswordToken.findFirst({ where: { email } });
+    if (resetToken) {
+        await prisma.resetPasswordToken.delete({ where: { id: resetToken.id } });
+    }
+    const newResetToken = await prisma.resetPasswordToken.create({
+        data: {
+            token: randomUUID(),
+            email,
+            expires: new Date(new Date().getTime() + 3600 * 24 * 2),
+        }
+    });
+    return newResetToken;
+};

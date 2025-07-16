@@ -2,6 +2,7 @@
 import Spiner from "@/app/_components/spiner";
 import { loginAction } from "@/app/actions/auth.action";
 import SocialProviders from "@/components/SocialProviders";
+import Link from "next/link";
 import React, { useState } from "react";
 import { toast } from "sonner";
 
@@ -61,10 +62,10 @@ const LoginForm = () => {
             onChange={(e) => setPassword(e.target.value)}
           />
         </div>
-
+        <Link href="/forgot-password " className="text-sm text-gray-500">Forgot Password</Link>
         <button
           type="submit"
-          className="w-full bg-gray-900 hover:bg-gray-800 text-white font-medium py-3 px-4 rounded-lg transition-colors duration-200"
+          className="mt-3 w-full bg-gray-900 hover:bg-gray-800 text-white font-medium py-3 px-4 rounded-lg transition-colors duration-200"
         >
           {isLoading ? <Spiner /> : "Sign In"}
         </button>

@@ -1,3 +1,4 @@
+
 import { z } from "zod";
 
 
@@ -14,4 +15,8 @@ export const registerSchema = z.object({
 }).refine((data) => data.password === data.confirmPassword, {
     message: "Passwords do not match",
     path: ["confirmPassword"],
+});
+
+export const resetPasswordSchema = z.object({
+    email: z.string().email({ message: "Invalid email address" }),
 });

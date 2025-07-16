@@ -85,8 +85,6 @@ export const logoutAction = async () => {
     await signOut()
 }
 
-
-
 export const registerAction = async (data: z.infer<typeof registerSchema>) => {
     // validate the data
     const validation = registerSchema.safeParse(data);
