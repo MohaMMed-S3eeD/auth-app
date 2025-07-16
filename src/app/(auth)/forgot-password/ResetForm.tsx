@@ -1,7 +1,7 @@
 "use client";
 import Spiner from "@/app/_components/spiner";
-import { resetPasswordAction } from "@/app/actions/pass.action";
-import { resetPasswordSchema } from "@/utils/validationSchmas";
+import { forgotPasswordAction } from "@/app/actions/pass.action";
+import { forgotPasswordSchema } from "@/utils/validationSchmas";
 import Link from "next/link";
 import React, { useState } from "react";
 import { toast } from "sonner";
@@ -12,13 +12,13 @@ const ResetForm = () => {
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const valdation = resetPasswordSchema.safeParse({ email });
+    const valdation = forgotPasswordSchema.safeParse({ email });
     if (!valdation.success) {
       toast.error(valdation.error.message);
       return;
     }
     setIsLoading(true);
-    resetPasswordAction(valdation.data).then((res) => {
+    forgotPasswordAction(valdation.data).then((res) => {
       if (res.success) {
         setIsLoading(false);
         toast.success(res.message);
