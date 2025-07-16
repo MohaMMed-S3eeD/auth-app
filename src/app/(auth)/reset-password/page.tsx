@@ -1,5 +1,6 @@
-import React from "react";
+import React, { Suspense } from "react";
 import ResetPasswordForm from "./ResetForm";
+import Spiner from "@/app/_components/spiner";
 
 const page = () => {
   return (
@@ -12,7 +13,9 @@ const page = () => {
         </div>
 
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-8">
-          <ResetPasswordForm />
+          <Suspense fallback={<div className="flex justify-center"><Spiner /></div>}>
+            <ResetPasswordForm />
+          </Suspense>
         </div>
       </div>
     </div>
