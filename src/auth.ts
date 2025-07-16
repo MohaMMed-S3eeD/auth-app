@@ -7,18 +7,18 @@ import authConfig from "./auth.config"
 import { DefaultSession } from "next-auth"
 
 declare module "next-auth" {
-  interface Session {
-    user: {
-      id: string
-      emailVerified: Date | null
-      role: "USER" | "ADMIN"
-    } & DefaultSession["user"]
-  }
+    interface Session {
+        user: {
+            id: string
+            emailVerified: Date | null
+            role: "USER" | "ADMIN"
+        } & DefaultSession["user"]
+    }
 
-  interface User {
-    emailVerified: Date | null
-    role: "USER" | "ADMIN"
-  }
+    interface User {
+        emailVerified: Date | null
+        role: "USER" | "ADMIN"
+    }
 }
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
@@ -30,7 +30,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         async session({ session, token }) {
             if (session.user) {
                 session.user.id = token.sub as string
-                
+
                 // Fetch emailVerified and role from database
                 const user = await prisma.user.findUnique({
                     where: { id: token.sub as string },
@@ -40,6 +40,21 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
                 session.user.role = user?.role ?? "USER"
             }
             return session
+        },
+        async signIn({ user, account }) {
+            // check if user create by credentials
+            if (account?.provider !== "credentials") return true
+            // get the user from the database
+            const userDB = await prisma.user.findUnique({
+                where: {
+                    id: user.id
+                }
+            })
+            // check if the user is verified
+            if (!userDB || !userDB.emailVerified) return false
+
+            // user is verified
+            return true
         }
     },
     events: {

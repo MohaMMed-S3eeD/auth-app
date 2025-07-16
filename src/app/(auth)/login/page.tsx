@@ -19,7 +19,10 @@ const page = () => {
           <div className="mt-6 text-center">
             <p className="text-sm text-gray-500">
               Don&apos;t have an account?{" "}
-              <Link href="/register" className="text-gray-900 font-medium hover:underline">
+              <Link
+                href="/register"
+                className="text-gray-900 font-medium hover:underline"
+              >
                 Create account
               </Link>
             </p>

@@ -7,12 +7,13 @@ import * as bcrypt from "bcryptjs";
 import { signIn, signOut } from "@/auth";
 import { AuthError } from "next-auth";
 import { generateVerificationToken } from "@/utils/generateToken";
+import { sendEmail } from "@/utils/mail";
 
 
 
 export const loginAction = async (data: z.infer<typeof loginSchema>) => {
+    // validate the data
     const validation = loginSchema.safeParse(data);
-
     if (!validation.success) {
         return {
             success: false,
@@ -20,14 +21,41 @@ export const loginAction = async (data: z.infer<typeof loginSchema>) => {
         }
     }
     const { email, password } = validation.data;
+    // check if the Email is verified
+    const user = await prisma.user.findUnique({
+        where: {
+            email: email
+        }
+    })
+    if (!user || !user.email || !user.password) {
+        return {
+            success: false,
+            error: "Email is not by credentials"
+        }
+    }
+    if (!user.emailVerified) {
+        // generate the verification token
+        const vToken = await generateVerificationToken(email);
+        console.log(vToken)
+        // send the verification email
+        sendEmail(email, vToken.token)
+
+
+        return {
+            success: false,
+            error: "Email is not verified, please check your email for verification"
+        }
+    }
+
     try {
+        // sign in the user
         await signIn("credentials", { email, password, redirectTo: "/profile" })
     } catch (error) {
-        // إذا كان الخطأ NEXT_REDIRECT، فهذا يعني نجح تسجيل الدخول وسيتم التوجيه
+        // if the error is NEXT_REDIRECT, it means the login was successful and the user will be redirected
         if (error instanceof Error && error.message === "NEXT_REDIRECT") {
-            throw error; // إعادة رمي الخطأ للسماح بالتوجيه
+            throw error; // throw the error to allow the redirect
         }
-
+        // if the error is an AuthError, it means the login was not successful
         if (error instanceof AuthError) {
             switch (error.type) {
                 case "CredentialsSignin":
@@ -60,6 +88,7 @@ export const logoutAction = async () => {
 
 
 export const registerAction = async (data: z.infer<typeof registerSchema>) => {
+    // validate the data
     const validation = registerSchema.safeParse(data);
 
     if (!validation.success) {
@@ -69,6 +98,7 @@ export const registerAction = async (data: z.infer<typeof registerSchema>) => {
         }
     }
     const { name, email, password } = validation.data;
+    // check if the user already exists
     const userCheck = await prisma.user.findUnique({
         where: {
             email: email
@@ -80,18 +110,26 @@ export const registerAction = async (data: z.infer<typeof registerSchema>) => {
             error: "User already exists"
         }
     }
+    // hash the password
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
-    const user = await prisma.user.create({
+    // create the user
+    await prisma.user.create({
         data: {
             name: name,
             email: email,
             password: hashedPassword
         }
     })
-    console.log(user)
+    // generate the verification token
     const vToken = await generateVerificationToken(email);
     console.log(vToken)
+    // send the verification email
+
+    //Todo : Send Email
+    sendEmail(email, vToken.token)
+
+    // return the success message
     return {
         success: true,
         message: "Please check your email for verification"
